@@ -1,12 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:taskati/core/constans/dailogs.dart';
 import 'package:taskati/core/functions/navigation.dart';
+import 'package:taskati/core/services/app_local_storange.dart';
 import 'package:taskati/core/utils/colors.dart';
 import 'package:taskati/core/utils/text_styles.dart';
 import 'package:taskati/core/widgets/custom_button.dart';
-import 'package:taskati/feature/home/home_view.dart';
+import 'package:taskati/feature/home/page/home_view.dart';
 
 class UploadScreen extends StatefulWidget {
   const UploadScreen({super.key});
@@ -24,7 +28,7 @@ class _UploadScreen extends State<UploadScreen> {
       appBar: AppBar(
         actions: [
           TextButton(
-              onPressed: () {
+              onPressed: () async {
                 if (path == null && name.isEmpty) {
                   ShowErrorDailogs(
                       context, 'please enter your name and upload image');
@@ -32,11 +36,17 @@ class _UploadScreen extends State<UploadScreen> {
                   ShowErrorDailogs(context, 'please upload image');
                 } else if (path != null && name.isEmpty) {
                   ShowErrorDailogs(context, 'please enter your name ');
-                } else {pushWithReplacement(context, const HomeView());}
+                } else {
+                  AppLocalStorange.cacheData(AppLocalStorange.nameKey,name);
+                  AppLocalStorange.cacheData(AppLocalStorange.imageKey,path);
+                  AppLocalStorange.cacheData(AppLocalStorange.isUploadKey,true);
+
+                pushWithReplacement(context, const HomeView());
+                }
               },
               child: Text(
                 'done',
-                style: GetbodyTextStyles(color: AppColors.primaryColor),
+                style: GetbodyTextStyles(color: AppColors.whiteColor),
               )),
         ],
       ),
@@ -48,7 +58,7 @@ class _UploadScreen extends State<UploadScreen> {
             children: [
               CircleAvatar(
                 radius: 70,
-                //backgroundColor: AppColors.primaryColor,
+                backgroundColor: AppColors.primaryColor,
                 backgroundImage: path != null
                     ? AssetImage(path!)
                     : const AssetImage('assets/images/user.png'),
@@ -116,3 +126,4 @@ class _UploadScreen extends State<UploadScreen> {
     );
   }
 }
+  
